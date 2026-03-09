@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDRL - Pro Drag Racing League</title>
+  <link rel="icon" href="/images/ProDragRacing.jpg">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-grid"></div>
+      <div class="container" style="position:relative;z-index:1">
+        <div class="grid grid-2" style="align-items:center;gap:3rem">
+          <div>
+            <div style="display:inline-flex;align-items:center;gap:8px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:9999px;padding:6px 16px;margin-bottom:1.5rem">
+              <span style="width:8px;height:8px;background:var(--red);border-radius:50%;animation:pulse 2s infinite"></span>
+              <span class="text-sm" style="color:#fca5a5;font-weight:600">Official PDRL Platform</span>
+            </div>
+            <h1 style="font-size:3rem;margin-bottom:1.5rem">
+              Heads-Up. Shootout. <span class="text-red">Pro-Level Organization.</span>
+            </h1>
+            <p class="text-lg text-secondary" style="margin-bottom:2rem;line-height:1.8">
+              Pro Drag Racing League (PDRL) is built for clean competition and clear structure —
+              drivetrain categories, Street vs Pro, and single-elimination brackets.
+            </p>
+            <div class="flex gap-4 flex-wrap" style="margin-bottom:3rem">
+              <a href="/events.html" class="btn btn-primary btn-lg">View Upcoming Events</a>
+              <a href="/classes.html" class="btn btn-outline btn-lg">See Classes &amp; Format</a>
+            </div>
+            <div class="grid grid-3" style="max-width:400px">
+              <div><div class="text-4xl font-bold text-red">4</div><div class="text-sm text-secondary font-medium">Race Classes</div></div>
+              <div><div class="text-4xl font-bold text-red">16</div><div class="text-sm text-secondary font-medium">Car Bracket Cap</div></div>
+              <div><div class="text-4xl font-bold text-red">1</div><div class="text-sm text-secondary font-medium">Single Elimination</div></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" id="next-event-card">
+              <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
+                <span class="badge badge-red">Next Event</span>
+                <span class="text-sm text-secondary" id="event-date">TBA</span>
+              </div>
+              <div class="card-body">
+                <h3 id="event-title" style="margin-bottom:4px">PDRL Shootout Night</h3>
+                <p class="text-sm text-secondary mb-4" id="event-location">Location TBA</p>
+
+                <div id="flyer-container" class="mb-6 hidden">
+                  <div class="flyer-preview" onclick="openFlyerModal()">
+                    <img id="flyer-img" src="" alt="Event flyer">
+                    <div class="flyer-overlay"><span class="badge badge-red">View Flyer</span></div>
+                  </div>
+                </div>
+
+                <div class="event-meta mb-6">
+                  <div class="event-meta-item"><div class="meta-label">Buy-in</div><div class="meta-value" id="event-buyin">TBA</div></div>
+                  <div class="event-meta-item"><div class="meta-label">Payout</div><div class="meta-value" id="event-payout">TBA</div></div>
+                  <div class="event-meta-item"><div class="meta-label">Format</div><div class="meta-value" id="event-format">Heads-Up • Single Elim</div></div>
+                  <div class="event-meta-item"><div class="meta-label">Entry Fee</div><div class="meta-value" id="event-price">$100</div></div>
+                </div>
+
+                <div class="flex gap-3">
+                  <a href="/register.html" class="btn btn-primary flex-1" style="text-align:center">Register Now</a>
+                  <a href="/pdrl-rules.pdf" target="_blank" class="btn btn-outline">Rules PDF</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20" style="background:rgba(17,24,39,0.3)">
+      <div class="container">
+        <div class="text-center mb-8">
+          <h2 style="margin-bottom:1rem">Clear structure. Fair racing.</h2>
+          <p class="text-lg text-secondary">Built to be easy to understand for racers, crew, and spectators.</p>
+        </div>
+        <div class="grid grid-4">
+          <div class="card"><div class="card-body text-center">
+            <div style="font-size:2.5rem;margin-bottom:1rem">🏁</div>
+            <h4 style="margin-bottom:0.5rem">Four Core Classes</h4>
+            <p class="text-sm text-secondary">True Street, Street Mod, Pro Street, and Pro — clearly defined in the official rulebook.</p>
+          </div></div>
+          <div class="card"><div class="card-body text-center">
+            <div style="font-size:2.5rem;margin-bottom:1rem">⚡</div>
+            <h4 style="margin-bottom:0.5rem">Street vs Pro</h4>
+            <p class="text-sm text-secondary">Two levels to keep participation high while still giving the fastest cars a home.</p>
+          </div></div>
+          <div class="card"><div class="card-body text-center">
+            <div style="font-size:2.5rem;margin-bottom:1rem">🧰</div>
+            <h4 style="margin-bottom:0.5rem">Rules That Read Clean</h4>
+            <p class="text-sm text-secondary">Simple language, fast tech inspection, and downloadable PDFs for quick sharing.</p>
+          </div></div>
+          <div class="card"><div class="card-body text-center">
+            <div style="font-size:2.5rem;margin-bottom:1rem">📸</div>
+            <h4 style="margin-bottom:0.5rem">Media &amp; Highlights</h4>
+            <p class="text-sm text-secondary">Post results, photo drops, and videos to keep the league active between events.</p>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20">
+      <div class="container">
+        <div class="grid grid-2" style="align-items:center;gap:3rem">
+          <div>
+            <h2 style="margin-bottom:1rem">Run it official.</h2>
+            <p class="text-lg text-secondary" style="margin-bottom:2rem;line-height:1.8">
+              Use this website as the single source of truth: events, rules, and class format —
+              clean enough to send to sponsors, venues, and racers.
+            </p>
+            <div class="flex gap-4">
+              <a href="/about.html" class="btn btn-primary">Read About PDRL</a>
+              <a href="/contact.html" class="btn btn-outline">Sponsor / Partner</a>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h4>Quick Links</h4></div>
+            <div class="card-body" style="padding:0">
+              <a href="/classes.html" style="display:flex;justify-content:space-between;padding:12px 24px;color:var(--text-secondary);border-bottom:1px solid var(--border)">
+                <span class="font-medium">Classes &amp; Format</span><span>→</span>
+              </a>
+              <a href="/rules.html" style="display:flex;justify-content:space-between;padding:12px 24px;color:var(--text-secondary);border-bottom:1px solid var(--border)">
+                <span class="font-medium">Rules &amp; Safety</span><span>→</span>
+              </a>
+              <a href="/events.html" style="display:flex;justify-content:space-between;padding:12px 24px;color:var(--text-secondary);border-bottom:1px solid var(--border)">
+                <span class="font-medium">Events &amp; Registration</span><span>→</span>
+              </a>
+              <a href="/leaderboard.html" style="display:flex;justify-content:space-between;padding:12px 24px;color:var(--text-secondary)">
+                <span class="font-medium">Leaderboard &amp; Results</span><span>→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Flyer Modal -->
+  <div id="flyer-modal" class="modal-overlay hidden" onclick="closeFlyerModal(event)">
+    <div class="modal" style="max-width:800px;padding:8px;background:#111827" onclick="event.stopPropagation()">
+      <img id="flyer-modal-img" src="" alt="Event flyer" style="width:100%;max-height:85vh;object-fit:contain;border-radius:var(--radius)">
+    </div>
+  </div>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/app.js"></script>
+  <script>
+    let currentFlyerUrl = null;
+
+    async function loadNextEvent() {
+      try {
+        const items = await PublicAPI.fetchEvents({ status: 'upcoming', limit: 20 });
+        const today = new Date(); today.setHours(0,0,0,0);
+        const upcoming = items.filter(e => e.date && new Date(e.date + 'T00:00:00') >= today);
+        upcoming.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+        if (upcoming.length === 0) return;
+
+        const evt = upcoming[0];
+        document.getElementById('event-date').textContent = UI.formatDate(evt.date);
+        document.getElementById('event-title').textContent = evt.title || 'PDRL Event';
+        document.getElementById('event-location').textContent = (evt.location || 'Location TBA') + ' • ' + (evt.start_time || 'Gates TBA');
+        document.getElementById('event-buyin').textContent = evt.buyin || 'TBA';
+        document.getElementById('event-payout').textContent = evt.payout || 'TBA';
+        document.getElementById('event-format').textContent = evt.format || 'Heads-Up • Single Elim';
+        document.getElementById('event-price').textContent = evt.price || 'TBA';
+
+        if (evt.flyer_key) {
+          const url = await PublicAPI.fetchFlyerUrl(evt.flyer_key);
+          if (url) {
+            currentFlyerUrl = url;
+            document.getElementById('flyer-img').src = url;
+            document.getElementById('flyer-container').classList.remove('hidden');
+          }
+        }
+      } catch (e) { console.error('Error loading event:', e); }
+    }
+
+    function openFlyerModal() {
+      if (!currentFlyerUrl) return;
+      document.getElementById('flyer-modal-img').src = currentFlyerUrl;
+      document.getElementById('flyer-modal').classList.remove('hidden');
+    }
+
+    function closeFlyerModal(e) {
+      document.getElementById('flyer-modal').classList.add('hidden');
+    }
+
+    loadNextEvent();
+  </script>
+
+  <style>
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  </style>
+</body>
+</html>

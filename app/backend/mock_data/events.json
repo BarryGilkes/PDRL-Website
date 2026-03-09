@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "PDRL Shootout Night",
+    "date": "2026-03-15",
+    "location": "Irwindale Speedway",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "buyin": "75",
+    "payout": "Winner takes all",
+    "format": "Bracket",
+    "status": "completed",
+    "notes": "Monthly drag racing event featuring all classes from True Street to Pro",
+    "flyer_key": "/images/DragRacing.jpg",
+    "created_at": "2026-02-01T10:00:00"
+  },
+  {
+    "id": 2,
+    "title": "PDRL Summer Nationals",
+    "date": "2026-06-15",
+    "location": "Irwindale Speedway",
+    "start_time": "16:00",
+    "end_time": "23:00",
+    "buyin": "75",
+    "payout": "Winner takes all",
+    "format": "Bracket",
+    "status": "upcoming",
+    "notes": "Summer championship event with all classes competing for season points",
+    "flyer_key": "/images/SummerNationals.jpg",
+    "created_at": "2026-02-01T10:00:00"
+  },
+  {
+    "id": 3,
+    "title": "PDRL Fall Classic",
+    "date": "2026-09-20",
+    "location": "Irwindale Speedway",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "buyin": "75",
+    "payout": "Winner takes all",
+    "format": "Bracket",
+    "status": "upcoming",
+    "notes": "End of season championship race with prizes for top finishers",
+    "flyer_key": "/images/Championship.jpg",
+    "created_at": "2026-02-01T10:00:00"
+  },
+  {
+    "id": 4,
+    "title": "PDRL Winter Warmup",
+    "date": "2026-12-10",
+    "location": "Irwindale Speedway",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "buyin": "75",
+    "payout": "Winner takes all",
+    "format": "Bracket",
+    "status": "upcoming",
+    "notes": "Season finale with special prizes and awards ceremony",
+    "flyer_key": "/images/WinterWarmup.jpg",
+    "created_at": "2026-02-01T10:00:00"
+  }
+]

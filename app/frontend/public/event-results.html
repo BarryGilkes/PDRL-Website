@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Results - PDRL</title>
+  <link rel="icon" href="/images/Event.jpg">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <main style="flex:1" class="py-12">
+    <div class="container">
+      <div class="mb-6">
+        <a href="/events.html" class="text-sm text-red" style="display:inline-flex;align-items:center;gap:4px;margin-bottom:1rem">← Back to Events</a>
+        <h1 id="event-title" style="margin-bottom:0.5rem">Event Results</h1>
+        <p class="text-secondary" id="event-info">Loading event details...</p>
+      </div>
+
+      <!-- Round Filter -->
+      <div class="card mb-6">
+        <div class="card-body">
+          <div class="flex gap-4 items-center flex-wrap">
+            <label class="text-sm font-medium text-secondary">Filter by round:</label>
+            <select id="round-filter" class="form-select" style="width:auto;min-width:180px" onchange="filterResults()">
+              <option value="">All Rounds</option>
+            </select>
+            <label class="text-sm font-medium text-secondary">Search driver:</label>
+            <input type="text" id="driver-search" class="form-input" style="width:auto;min-width:200px" placeholder="Driver name..." oninput="filterResults()">
+          </div>
+        </div>
+      </div>
+
+      <div id="results-container">
+        <div class="loading"><div class="spinner"></div><p class="mt-4">Loading results...</p></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/app.js"></script>
+  <script>
+    let allResults = [];
+
+    async function loadResults() {
+      const eventId = UI.getQueryParam('eventId');
+      if (!eventId) {
+        document.getElementById('results-container').innerHTML = '<div class="alert alert-error">No event ID specified. <a href="/events.html">Go to Events</a></div>';
+        return;
+      }
+
+      try {
+        // Load event details
+        const events = await PublicAPI.fetchEvents({ limit: 100 });
+        const event = events.find(e => String(e.id) === String(eventId));
+        if (event) {
+          document.getElementById('event-title').textContent = event.title + ' — Results';
+          document.getElementById('event-info').textContent = `${UI.formatDate(event.date)} • ${event.location || 'TBA'} • ${event.format || ''}`;
+          document.title = `${event.title} Results - PDRL`;
+        }
+
+        // Load race times for this event
+        const data = await PublicAPI.fetchRaceTimes({
+          query: { event_id: parseInt(eventId) },
+          limit: 2000,
+          sort: 'round'
+        });
+        allResults = data.items || [];
+
+        // Populate round filter
+        const rounds = [...new Set(allResults.map(r => r.round).filter(Boolean))];
+        const roundSelect = document.getElementById('round-filter');
+        rounds.forEach(r => {
+          const opt = document.createElement('option');
+          opt.value = r; opt.textContent = r;
+          roundSelect.appendChild(opt);
+        });
+
+        filterResults();
+      } catch (e) {
+        document.getElementById('results-container').innerHTML = `<div class="alert alert-error">Error: ${UI.escapeHtml(e.message)}</div>`;
+      }
+    }
+
+    function filterResults() {
+      const roundFilter = document.getElementById('round-filter').value;
+      const driverSearch = document.getElementById('driver-search').value.toLowerCase();
+      const container = document.getElementById('results-container');
+
+      let filtered = allResults;
+      if (roundFilter) filtered = filtered.filter(r => r.round === roundFilter);
+      if (driverSearch) filtered = filtered.filter(r => (r.driver_name || '').toLowerCase().includes(driverSearch));
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="card"><div class="card-body text-center py-12"><p class="text-secondary text-lg">No race times recorded for this event yet.</p></div></div>';
+        return;
+      }
+
+      // Group by round
+      const grouped = {};
+      filtered.forEach(r => {
+        const round = r.round || 'Unknown';
+        if (!grouped[round]) grouped[round] = [];
+        grouped[round].push(r);
+      });
+
+      let html = '';
+      for (const [round, times] of Object.entries(grouped)) {
+        html += `
+          <div class="card mb-6">
+            <div class="card-header"><h3>${UI.escapeHtml(round)}</h3><span class="text-sm text-secondary">${times.length} runs</span></div>
+            <div class="card-body" style="padding:0">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Driver</th>
+                      <th>Comp #</th>
+                      <th>Lane</th>
+                      <th class="text-right">1/4 Mile</th>
+                      <th class="text-right">Speed</th>
+                      <th class="text-right">RT</th>
+                      <th class="text-right">60ft</th>
+                      <th class="text-right">1/8 Mile</th>
+                      <th class="text-right">Dial-In</th>
+                      <th class="text-center">Win</th>
+                      <th class="text-center">Redlight</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${times.map(t => `
+                      <tr>
+                        <td class="font-semibold">${UI.escapeHtml(t.driver_name || 'Unknown')}</td>
+                        <td>${t.competition_number != null ? '<span class="badge badge-outline">#' + t.competition_number + '</span>' : '—'}</td>
+                        <td>${UI.escapeHtml(t.lane || '—')}</td>
+                        <td class="text-right font-bold text-red">${t.quarter_mile_time ? t.quarter_mile_time.toFixed(3) + 's' : '—'}</td>
+                        <td class="text-right">${t.quarter_mile_speed ? t.quarter_mile_speed.toFixed(2) + ' mph' : '—'}</td>
+                        <td class="text-right">${t.reaction_time ? t.reaction_time.toFixed(4) : '—'}</td>
+                        <td class="text-right">${t.sixty_foot ? t.sixty_foot.toFixed(3) : '—'}</td>
+                        <td class="text-right">${t.eighth_mile_time ? t.eighth_mile_time.toFixed(3) : '—'}</td>
+                        <td class="text-right">${t.dial_in ? t.dial_in.toFixed(3) : '—'}</td>
+                        <td class="text-center">${t.win === true ? '✅' : t.win === false ? '❌' : '—'}</td>
+                        <td class="text-center">${t.redlight === true ? '🔴' : '—'}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    loadResults();
+  </script>
+</body>
+</html>

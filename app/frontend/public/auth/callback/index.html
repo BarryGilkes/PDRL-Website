@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authenticating... - PDRL</title>
+  <link rel="icon" href="/images/Authentication.jpg">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh">
+    <div class="card" style="max-width:400px;width:100%">
+      <div class="card-body text-center">
+        <div class="spinner mb-4" style="margin:0 auto"></div>
+        <h3 style="margin-bottom:0.5rem">Authenticating...</h3>
+        <p class="text-secondary text-sm">Please wait while we complete your login.</p>
+        <p id="auth-error" class="text-red mt-4 hidden"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const TOKEN_KEY = 'pdrl_token';
+      const EXPIRES_KEY = 'pdrl_token_expires';
+
+      // Read token from URL query params (backend redirects here with ?token=...&expires_at=...)
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+      const expiresAt = params.get('expires_at');
+
+      if (token && expiresAt) {
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(EXPIRES_KEY, expiresAt);
+        window.location.href = '/';
+      } else {
+        // Check for error
+        const msg = params.get('msg') || 'Authentication failed. Please try again.';
+        document.getElementById('auth-error').textContent = msg;
+        document.getElementById('auth-error').classList.remove('hidden');
+        document.querySelector('.spinner').style.display = 'none';
+        document.querySelector('h3').textContent = 'Login Failed';
+
+        // Redirect to home after delay
+        setTimeout(() => { window.location.href = '/'; }, 3000);
+      }
+    })();
+  </script>
+</body>
+</html>

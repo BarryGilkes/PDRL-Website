@@ -1,0 +1,33 @@
+{
+    "title": "event_classes",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "event_id": {
+            "type": "integer",
+            "description": "Foreign key to events table"
+        },
+        "name": {
+            "type": "string",
+            "description": "Class name (True Street, Street Mod, Pro Street, Pro)"
+        },
+        "cap": {
+            "type": "integer",
+            "description": "Maximum number of entries"
+        },
+        "filled": {
+            "type": "integer",
+            "description": "Number of confirmed entries"
+        }
+    },
+    "required": [
+        "id",
+        "event_id",
+        "name",
+        "cap",
+        "filled"
+    ]
+}

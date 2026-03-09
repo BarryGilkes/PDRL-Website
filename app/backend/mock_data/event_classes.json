@@ -1,0 +1,26 @@
+[
+    {
+        "event_id": 1,
+        "name": "True Street",
+        "cap": 16,
+        "filled": 0
+    },
+    {
+        "event_id": 1,
+        "name": "Street Mod",
+        "cap": 16,
+        "filled": 0
+    },
+    {
+        "event_id": 1,
+        "name": "Pro Street",
+        "cap": 16,
+        "filled": 0
+    },
+    {
+        "event_id": 1,
+        "name": "Pro",
+        "cap": 16,
+        "filled": 0
+    }
+]

@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 15% 3%;
+    --foreground: 210 40% 96%;
+
+    --card: 240 12% 6%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 240 12% 8%;
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 193 100% 50%;
+    --primary-foreground: 240 15% 3%;
+
+    --secondary: 220 14% 12%;
+    --secondary-foreground: 210 40% 96%;
+
+    --muted: 220 14% 14%;
+    --muted-foreground: 215 20% 55%;
+
+    --accent: 14 100% 60%;
+    --accent-foreground: 240 15% 3%;
+
+    --destructive: 4 100% 59%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 14% 14%;
+    --input: 220 14% 14%;
+    --ring: 193 100% 50%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 240 12% 5%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 193 100% 50%;
+    --sidebar-primary-foreground: 240 15% 3%;
+    --sidebar-accent: 220 14% 12%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 220 14% 14%;
+    --sidebar-ring: 193 100% 50%;
+  }
+
+  .dark {
+    --background: 240 15% 3%;
+    --foreground: 210 40% 96%;
+
+    --card: 240 12% 6%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 240 12% 8%;
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 193 100% 50%;
+    --primary-foreground: 240 15% 3%;
+
+    --secondary: 220 14% 12%;
+    --secondary-foreground: 210 40% 96%;
+
+    --muted: 220 14% 14%;
+    --muted-foreground: 215 20% 55%;
+
+    --accent: 14 100% 60%;
+    --accent-foreground: 240 15% 3%;
+
+    --destructive: 4 100% 59%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 14% 14%;
+    --input: 220 14% 14%;
+    --ring: 193 100% 50%;
+
+    --sidebar-background: 240 12% 5%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 193 100% 50%;
+    --sidebar-primary-foreground: 240 15% 3%;
+    --sidebar-accent: 220 14% 12%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 220 14% 14%;
+    --sidebar-ring: 193 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  /* Neon glow effects */
+  .glow-cyan {
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3), 0 0 30px rgba(0, 212, 255, 0.1);
+  }
+  .glow-cyan-strong {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.2), 0 0 60px rgba(0, 212, 255, 0.1);
+  }
+  .glow-red {
+    box-shadow: 0 0 15px rgba(255, 59, 48, 0.3), 0 0 30px rgba(255, 59, 48, 0.1);
+  }
+  .glow-red-strong {
+    box-shadow: 0 0 20px rgba(255, 59, 48, 0.5), 0 0 40px rgba(255, 59, 48, 0.2);
+  }
+
+  /* Text glow */
+  .text-glow-cyan {
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5), 0 0 20px rgba(0, 212, 255, 0.3);
+  }
+  .text-glow-red {
+    text-shadow: 0 0 10px rgba(255, 59, 48, 0.5), 0 0 20px rgba(255, 59, 48, 0.3);
+  }
+
+  /* Glass card */
+  .glass-card {
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-xl;
+  }
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300;
+  }
+  .glass-card-hover:hover {
+    @apply border-cyan-500/30 bg-white/[0.06];
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.1), 0 4px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+  }
+
+  /* Gradient borders */
+  .gradient-border {
+    position: relative;
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.4), rgba(255, 59, 48, 0.4));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Neon underline for active nav */
+  .neon-underline {
+    position: relative;
+  }
+  .neon-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #050508;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 255, 0.2);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 212, 255, 0.4);
+  }
+}

@@ -1,0 +1,37 @@
+{
+    "title": "admins",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID from auth system"
+        },
+        "email": {
+            "type": "string",
+            "description": "Admin email address"
+        },
+        "role": {
+            "type": "string",
+            "description": "Admin role: super_admin or admin"
+        },
+        "added_by": {
+            "type": "string",
+            "description": "User ID of the admin who added this admin"
+        },
+        "created_at": {
+            "type": "string",
+            "description": "Timestamp when admin was added"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "email",
+        "role",
+        "created_at"
+    ]
+}

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard - PDRL</title>
+  <link rel="icon" href="/images/Leaderboard.jpg">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="site-header" id="site-header"></header>
+
+  <main style="flex:1" class="py-12">
+    <div class="container">
+      <div class="mb-8">
+        <div style="display:inline-flex;align-items:center;gap:8px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:9999px;padding:6px 16px;margin-bottom:1rem">
+          <span class="text-sm" style="color:#fca5a5;font-weight:600">🏆 Leaderboard</span>
+        </div>
+        <h1 style="margin-bottom:0.5rem">Fastest Times</h1>
+        <p class="text-lg text-secondary">Top performers across PDRL events. Select a year to view rankings.</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="card mb-6">
+        <div class="card-header"><h4>Filters</h4></div>
+        <div class="card-body">
+          <div class="grid grid-3">
+            <div class="form-group">
+              <label class="form-label">Calendar Year <span class="text-red">*</span></label>
+              <select id="year-filter" class="form-select" onchange="filterLeaderboard()">
+                <option value="">Loading...</option>
+              </select>
+              <p class="text-xs text-muted mt-2">Required: Select a year to view data</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Class</label>
+              <select id="class-filter" class="form-select" onchange="filterLeaderboard()">
+                <option value="all">All Classes</option>
+                <option value="True Street">True Street</option>
+                <option value="Street Mod">Street Mod</option>
+                <option value="Pro Street">Pro Street</option>
+                <option value="Pro">Pro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Event</label>
+              <select id="event-filter" class="form-select" onchange="filterLeaderboard()">
+                <option value="all">All Events</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="leaderboard-container">
+        <div class="loading"><div class="spinner"></div><p class="mt-4">Loading leaderboard...</p></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/app.js"></script>
+  <script>
+    let allLeaderboard = [];
+    let allEvents = [];
+
+    async function loadLeaderboard() {
+      try {
+        // Load events
+        allEvents = await PublicAPI.fetchEvents({ limit: 100 });
+
+        // Extract years
+        const years = new Set();
+        allEvents.forEach(e => { if (e.date) years.add(e.date.split('-')[0]); });
+        const sortedYears = [...years].sort((a, b) => b.localeCompare(a));
+        const currentYear = new Date().getFullYear().toString();
+        const defaultYear = sortedYears.includes(currentYear) ? currentYear : sortedYears[0] || '';
+
+        const yearSelect = document.getElementById('year-filter');
+        yearSelect.innerHTML = sortedYears.map(y => `<option value="${y}" ${y === defaultYear ? 'selected' : ''}>${y}</option>`).join('');
+
+        // Load registrations and race times
+        const [regsData, timesData] = await Promise.all([
+          PublicAPI.fetchRegistrations({ limit: 500 }),
+          PublicAPI.fetchRaceTimes({ limit: 2000 })
+        ]);
+
+        const registrations = regsData.items || [];
+        const raceTimes = timesData.items || [];
+
+        // Build leaderboard: best time per driver per year
+        const driverYearMap = new Map();
+        for (const reg of registrations) {
+          const event = allEvents.find(e => e.id === reg.event_id);
+          const eventYear = event?.date ? event.date.split('-')[0] : 'N/A';
+          const regTimes = raceTimes.filter(t => t.registration_id === reg.id);
+
+          let bestTime = null;
+          for (const t of regTimes) {
+            if (t.quarter_mile_time && (!bestTime || t.quarter_mile_time < bestTime.quarter_mile_time)) {
+              bestTime = t;
+            }
+          }
+
+          if (bestTime && bestTime.quarter_mile_time) {
+            const key = `${reg.driver_name.toLowerCase()}|${eventYear}`;
+            const existing = driverYearMap.get(key);
+            if (!existing || bestTime.quarter_mile_time < existing.best_quarter_time) {
+              driverYearMap.set(key, {
+                competition_number: reg.competition_number || 'N/A',
+                driver_name: reg.driver_name,
+                car: reg.car,
+                class_name: reg.class_name,
+                best_quarter_time: bestTime.quarter_mile_time,
+                best_quarter_speed: bestTime.quarter_mile_speed || 0,
+                event_title: event?.title || 'Unknown',
+                event_date: event?.date || 'N/A',
+                event_year: eventYear
+              });
+            }
+          }
+        }
+
+        allLeaderboard = [...driverYearMap.values()].sort((a, b) => a.best_quarter_time - b.best_quarter_time);
+        filterLeaderboard();
+      } catch (e) {
+        document.getElementById('leaderboard-container').innerHTML = `<div class="alert alert-error">Error: ${UI.escapeHtml(e.message)}</div>`;
+      }
+    }
+
+    function filterLeaderboard() {
+      const year = document.getElementById('year-filter').value;
+      const cls = document.getElementById('class-filter').value;
+      const evt = document.getElementById('event-filter').value;
+      const container = document.getElementById('leaderboard-container');
+
+      // Update event filter for selected year
+      const eventsForYear = allEvents.filter(e => e.date && e.date.startsWith(year));
+      const eventSelect = document.getElementById('event-filter');
+      const currentEvtVal = eventSelect.value;
+      eventSelect.innerHTML = '<option value="all">All Events</option>' +
+        eventsForYear.map(e => `<option value="${UI.escapeHtml(e.title)}">${UI.escapeHtml(e.title)} - ${UI.formatDate(e.date)}</option>`).join('');
+      if ([...eventSelect.options].some(o => o.value === currentEvtVal)) eventSelect.value = currentEvtVal;
+
+      if (!year) {
+        container.innerHTML = '<div class="card"><div class="card-body text-center py-12"><p class="text-secondary text-lg">Please select a calendar year.</p></div></div>';
+        return;
+      }
+
+      let filtered = allLeaderboard.filter(e => e.event_year === year);
+      if (cls !== 'all') filtered = filtered.filter(e => e.class_name === cls);
+      if (evt !== 'all') filtered = filtered.filter(e => e.event_title === evt);
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="card"><div class="card-body text-center py-12"><p class="text-secondary text-lg">No times recorded for the selected filters.</p></div></div>';
+        return;
+      }
+
+      // Podium
+      let html = '';
+      if (filtered.length >= 3 && cls === 'all' && evt === 'all') {
+        const medals = ['🏆', '🥈', '🥉'];
+        const podiumClasses = ['podium-1', 'podium-2', 'podium-3'];
+        const order = [1, 0, 2]; // Show 2nd, 1st, 3rd
+        html += '<div class="podium">';
+        for (const i of order) {
+          const e = filtered[i];
+          html += `
+            <div class="card ${podiumClasses[i]} podium-card">
+              <div class="podium-icon">${medals[i]}</div>
+              <span class="badge badge-outline mb-2">#${UI.escapeHtml(String(e.competition_number))}</span>
+              <h3 style="margin-bottom:4px">${UI.escapeHtml(e.driver_name)}</h3>
+              <p class="text-sm text-secondary mb-4">${UI.escapeHtml(e.car)}</p>
+              <div class="podium-time">${e.best_quarter_time.toFixed(3)}s</div>
+              <div class="text-sm text-secondary">${e.best_quarter_speed.toFixed(2)} mph</div>
+              <span class="badge badge-outline mt-2">${UI.escapeHtml(e.class_name)}</span>
+            </div>`;
+        }
+        html += '</div>';
+      }
+
+      // Table
+      html += `
+        <div class="card mb-6">
+          <div class="card-header"><h3>Complete Rankings — ${year}</h3></div>
+          <div class="card-body" style="padding:0">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:60px">Rank</th>
+                    <th style="width:80px">Comp #</th>
+                    <th>Driver</th>
+                    <th>Car</th>
+                    <th>Class</th>
+                    <th class="text-right">1/4 Mile</th>
+                    <th class="text-right">Speed</th>
+                    <th>Event</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${filtered.map((e, i) => `
+                    <tr style="${i < 3 ? 'background:rgba(255,255,255,0.03)' : ''}">
+                      <td>${rankBadge(i)}</td>
+                      <td><span class="badge badge-outline" style="border-color:var(--red);color:var(--red-light)">#${UI.escapeHtml(String(e.competition_number))}</span></td>
+                      <td class="font-semibold">${UI.escapeHtml(e.driver_name)}</td>
+                      <td class="text-secondary">${UI.escapeHtml(e.car)}</td>
+                      <td><span class="badge badge-outline">${UI.escapeHtml(e.class_name)}</span></td>
+                      <td class="text-right font-bold text-red" style="font-size:1rem">${e.best_quarter_time.toFixed(3)}s</td>
+                      <td class="text-right text-secondary">${e.best_quarter_speed.toFixed(2)} mph</td>
+                      <td class="text-sm text-secondary">${UI.escapeHtml(e.event_title)}<br><span class="text-xs">${e.event_date}</span></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>`;
+
+      // Stats
+      const topSpeed = Math.max(...filtered.map(e => e.best_quarter_speed));
+      const avgTime = filtered.reduce((s, e) => s + e.best_quarter_time, 0) / filtered.length;
+      html += `
+        <div class="stat-grid">
+          <div class="card stat-card"><div class="stat-label">Total Racers (${year})</div><div class="stat-value">${filtered.length}</div></div>
+          <div class="card stat-card"><div class="stat-label">Fastest Time</div><div class="stat-value">${filtered[0].best_quarter_time.toFixed(3)}s</div></div>
+          <div class="card stat-card"><div class="stat-label">Top Speed</div><div class="stat-value">${topSpeed.toFixed(1)}<span class="text-sm text-secondary ml-1">mph</span></div></div>
+          <div class="card stat-card"><div class="stat-label">Average Time</div><div class="stat-value">${avgTime.toFixed(3)}s</div></div>
+        </div>`;
+
+      container.innerHTML = html;
+    }
+
+    function rankBadge(i) {
+      if (i === 0) return '<span class="badge badge-yellow">1st</span>';
+      if (i === 1) return '<span class="badge badge-gray">2nd</span>';
+      if (i === 2) return '<span class="badge badge-orange">3rd</span>';
+      return '<span class="badge badge-outline">' + (i + 1) + 'th</span>';
+    }
+
+    loadLeaderboard();
+  </script>
+</body>
+</html>

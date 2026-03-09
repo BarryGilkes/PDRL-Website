@@ -1,0 +1,65 @@
+{
+    "title": "events",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "title": {
+            "type": "string",
+            "description": "Event title"
+        },
+        "date": {
+            "type": "string",
+            "description": "Event date"
+        },
+        "location": {
+            "type": "string",
+            "description": "Event location"
+        },
+        "time": {
+            "type": "string",
+            "description": "Event time details"
+        },
+        "buyin": {
+            "type": "string",
+            "description": "Buy-in amount"
+        },
+        "payout": {
+            "type": "string",
+            "description": "Payout structure"
+        },
+        "format": {
+            "type": "string",
+            "description": "Race format"
+        },
+        "price": {
+            "type": "string",
+            "description": "Entry price"
+        },
+        "payment_method": {
+            "type": "string",
+            "description": "Payment method"
+        },
+        "status": {
+            "type": "string",
+            "description": "Event status (upcoming, completed, cancelled)"
+        },
+        "notes": {
+            "type": "string",
+            "description": "Additional notes"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "title",
+        "date",
+        "status"
+    ]
+}

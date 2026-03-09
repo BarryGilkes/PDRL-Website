@@ -1,0 +1,65 @@
+{
+    "title": "registrations",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID from authentication"
+        },
+        "event_id": {
+            "type": "integer",
+            "description": "Foreign key to events table"
+        },
+        "driver_name": {
+            "type": "string",
+            "description": "Driver or team name"
+        },
+        "phone": {
+            "type": "string",
+            "description": "Phone number"
+        },
+        "class_name": {
+            "type": "string",
+            "description": "Racing class"
+        },
+        "car": {
+            "type": "string",
+            "description": "Car details (year/make/model)"
+        },
+        "notes": {
+            "type": "string",
+            "description": "Setup notes"
+        },
+        "payment_reference": {
+            "type": "string",
+            "description": "Payment confirmation reference"
+        },
+        "payment_status": {
+            "type": "string",
+            "description": "Payment status (pending, confirmed, cancelled)"
+        },
+        "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Submission timestamp"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "event_id",
+        "driver_name",
+        "phone",
+        "class_name",
+        "car"
+    ]
+}

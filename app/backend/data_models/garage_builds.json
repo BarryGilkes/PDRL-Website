@@ -1,0 +1,54 @@
+{
+    "title": "garage_builds",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Primary key, auto-increment"
+        },
+        "user_id": {
+            "type": "string",
+            "description": "User ID from authentication"
+        },
+        "name": {
+            "type": "string",
+            "description": "Owner name"
+        },
+        "car": {
+            "type": "string",
+            "description": "Car details"
+        },
+        "drivetrain": {
+            "type": "string",
+            "description": "Drivetrain type (FWD, RWD, AWD)"
+        },
+        "class_name": {
+            "type": "string",
+            "description": "Racing class"
+        },
+        "mods": {
+            "type": "string",
+            "description": "Modifications description"
+        },
+        "photo_url": {
+            "type": "string",
+            "description": "Photo URL"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status (pending, approved, rejected)"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+        }
+    },
+    "required": [
+        "id",
+        "user_id",
+        "name",
+        "car",
+        "class_name"
+    ]
+}
