@@ -73,7 +73,7 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <img
-              src="/logo.png"
+              src="/logo.webp"
               alt="PDRL"
               className="h-14 w-auto transition-transform duration-300 group-hover:scale-105"
               onError={(e) => { e.currentTarget.style.display = 'none'; }}

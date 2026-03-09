@@ -127,7 +127,7 @@ export default function Index() {
                 <div className="relative">
                   <div className="absolute inset-0 bg-neon-cyan/10 rounded-full blur-[80px]" />
                   <img
-                    src="/images/pdrl-logo.png"
+                    src="/images/pdrl-logo.webp"
                     alt="Pro Drag Racing League Logo"
                     className="relative z-10 w-[300px] md:w-[400px] lg:w-[500px] h-auto drop-shadow-[0_0_40px_rgba(0,212,255,0.3)]"
                   />
