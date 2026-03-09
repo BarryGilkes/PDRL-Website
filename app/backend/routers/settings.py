@@ -68,7 +68,8 @@ async def get_settings(current_user: UserResponse = Depends(get_admin_user)):
         frontend_vars = read_env_file("frontend")
 
         backend_descriptions = {
-            "DATABASE_URL": "Database cRIPE_SECRET_KEY": "Stripe secret key",
+            "DATABASE_URL": "Database connection string",
+            "STRIPE_SECRET_KEY": "Stripe secret key",
             "STRIPE_SUCCESS_URL": "Payment success callback URL",
             "STRIPE_CANCEL_URL": "Payment cancellation callback URL",
             "ALLOWED_DOMAINS": "Allowed domains",

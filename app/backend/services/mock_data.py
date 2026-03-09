@@ -135,7 +135,7 @@ async def _load_table_from_file(data_file: Path):
             return
 
         row_count = await conn.scalar(select(func.count()).select_from(table))
-        force_reseed = os.environ.get("MGX_FORCE_RESEED_TABLES", "race_times,registrations")
+        force_reseed = os.environ.get("MGX_FORCE_RESEED_TABLES", "")
         tables_to_reseed = [t.strip() for t in force_reseed.split(",") if t.strip()]
         if row_count and row_count > 0:
             if table_name in tables_to_reseed:
