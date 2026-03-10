@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
+from sqlalchemy import text
 from core.database import get_db
 from dependencies.auth import get_current_user
 from schemas.auth import UserResponse
@@ -127,6 +128,87 @@ async def get_my_registrations(
     service = RegistrationsService(db)
     result = await service.get_list(skip=skip, limit=limit, user_id=current_user.id)
     return result
+
+
+
+
+@router.get("/lookup")
+async def lookup_racer(
+    q: str = "",
+    db: AsyncSession = Depends(get_db),
+):
+    """Search race_times for a driver by name or competition number.
+    Returns distinct driver profiles for registration autocomplete.
+    Public endpoint - no auth required."""
+    if not q or len(q.strip()) < 2:
+        return {"results": []}
+
+    query_str = q.strip()
+
+    # Search by competition number (if numeric) or driver name (fuzzy)
+    if query_str.isdigit():
+        sql = text("""
+            SELECT DISTINCT ON (driver_name, competition_number)
+                driver_name, competition_number
+            FROM race_times
+            WHERE competition_number::text LIKE :q
+            ORDER BY driver_name, competition_number
+            LIMIT 10
+        """)
+        params = {"q": f"{query_str}%"}
+    else:
+        sql = text("""
+            SELECT DISTINCT ON (driver_name, competition_number)
+                driver_name, competition_number
+            FROM race_times
+            WHERE LOWER(driver_name) LIKE LOWER(:q)
+            ORDER BY driver_name, competition_number
+            LIMIT 10
+        """)
+        params = {"q": f"%{query_str}%"}
+
+    result = await db.execute(sql, params)
+    rows = result.fetchall()
+
+    # Also check previous registrations for more complete data (phone, car, class)
+    profiles = []
+    for row in rows:
+        driver_name = row[0]
+        comp_num = row[1]
+
+        # Look up most recent registration for this driver
+        reg_sql = text("""
+            SELECT driver_name, competition_number, phone, class_name, car
+            FROM registrations
+            WHERE LOWER(driver_name) = LOWER(:name)
+            OR competition_number = :comp_num
+            ORDER BY id DESC
+            LIMIT 1
+        """)
+        reg_result = await db.execute(reg_sql, {
+            "name": driver_name,
+            "comp_num": str(comp_num) if comp_num else "",
+        })
+        reg_row = reg_result.fetchone()
+
+        if reg_row:
+            profiles.append({
+                "driver_name": reg_row[0],
+                "competition_number": str(reg_row[1]) if reg_row[1] else str(comp_num or ""),
+                "phone": reg_row[2] or "",
+                "class_name": reg_row[3] or "",
+                "car": reg_row[4] or "",
+            })
+        else:
+            profiles.append({
+                "driver_name": driver_name or "",
+                "competition_number": str(comp_num) if comp_num else "",
+                "phone": "",
+                "class_name": "",
+                "car": "",
+            })
+
+    return {"results": profiles}
 
 
 @router.get("/{registration_id}")
