@@ -42,7 +42,7 @@ export default function Leaderboard() {
   const [availableYears, setAvailableYears] = useState<string[]>([]);
   const [selectedClass, setSelectedClass] = useState('all');
   const [availableClasses, setAvailableClasses] = useState<string[]>([]);
-  const [distance, setDistance] = useState<DistanceMode>('quarter');
+  const [distance, setDistance] = useState<DistanceMode>('eighth');
 
   useEffect(() => {
     loadLeaderboard();
