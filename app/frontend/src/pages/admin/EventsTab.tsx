@@ -25,6 +25,12 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
   const [flyerPreviewUrl, setFlyerPreviewUrl] = useState<string | null>(null);
   const [pendingFlyerKey, setPendingFlyerKey] = useState<string | null>(null);
   const [flyerUrls, setFlyerUrls] = useState<Record<number, string>>({});
+  const [asrUploading, setAsrUploading] = useState(false);
+  const [asrPreviewUrl, setAsrPreviewUrl] = useState<string | null>(null);
+  const [pendingAsrKey, setPendingAsrKey] = useState<string | null>(null);
+  const [asrUrls, setAsrUrls] = useState<Record<number, string>>({});
+  const asrInputRef = useRef<HTMLInputElement>(null);
+  const editAsrInputRef = useRef<HTMLInputElement>(null);
   const flyerInputRef = useRef<HTMLInputElement>(null);
   const editFlyerInputRef = useRef<HTMLInputElement>(null);
   const raceDataInputRef = useRef<HTMLInputElement>(null);
@@ -161,6 +167,54 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
     if (editFlyerInputRef.current) editFlyerInputRef.current.value = '';
   };
 
+  const handleAsrUpload = async (file: File, isEdit: boolean = false) => {
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      toast.error('Invalid file type. Please upload a PDF file.');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File too large. Maximum size is 10MB.');
+      return;
+    }
+
+    setAsrUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/v1/asrs/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.detail || `Upload failed (${response.status})`);
+      }
+
+      const data = await response.json();
+      setPendingAsrKey(data.object_key);
+      setAsrPreviewUrl(data.url);
+
+      toast.success('ASR document uploaded successfully!');
+    } catch (error: any) {
+      console.error('ASR upload error:', error);
+      toast.error(error.message || 'Failed to upload ASR document. Please try again.');
+    } finally {
+      setAsrUploading(false);
+    }
+  };
+
+  const handleRemoveAsr = () => {
+    setPendingAsrKey(null);
+    setAsrPreviewUrl(null);
+    if (asrInputRef.current) asrInputRef.current.value = '';
+    if (editAsrInputRef.current) editAsrInputRef.current.value = '';
+  };
+
   // Flyer upload section component
   const FlyerUploadSection = ({ inputRef, isEdit }: { inputRef: React.RefObject<HTMLInputElement>; isEdit: boolean }) => (
     <div>
@@ -216,6 +270,60 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
           <div className="mt-2 flex items-center gap-2 text-yellow-400 text-sm">
             <div className="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
             Uploading flyer...
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+
+  // ASR upload section component
+  const AsrUploadSection = ({ inputRef, isEdit }: { inputRef: React.RefObject<HTMLInputElement>; isEdit: boolean }) => (
+    <div>
+      <Label className="text-gray-200 font-medium">Event ASR Document (Optional)</Label>
+      <div className="mt-2">
+        {asrPreviewUrl ? (
+          <div className="relative inline-block">
+            <div className="max-h-24 rounded border border-gray-600 bg-gray-800 p-4 flex items-center gap-3">
+              <FileUp className="w-6 h-6 text-green-400" />
+              <div>
+                <p className="text-white text-sm font-medium">ASR Document Uploaded</p>
+                <p className="text-gray-400 text-xs">PDF ready for download</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleRemoveAsr}
+              className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <div
+            onClick={() => inputRef.current?.click()}
+            className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-red-500 transition-colors"
+          >
+            <FileUp className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-gray-400 text-sm">Click to upload ASR document (PDF)</p>
+            <p className="text-gray-500 text-xs mt-1">PDF only • Max 10MB</p>
+          </div>
+        )}
+        <input
+          ref={inputRef}
+          type="file"
+          accept="application/pdf"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleAsrUpload(file, isEdit);
+          }}
+          disabled={asrUploading}
+        />
+        {asrUploading && (
+          <div className="mt-2 flex items-center gap-2 text-yellow-400 text-sm">
+            <div className="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+            Uploading ASR document...
           </div>
         )}
       </div>
@@ -390,6 +498,8 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
         notes: eventForm.notes,
         flyer_key: pendingFlyerKey || null,
         flyer_url: (pendingFlyerKey && flyerPreviewUrl) ? flyerPreviewUrl : null,
+        asr_key: pendingAsrKey || null,
+        asr_url: (pendingAsrKey && asrPreviewUrl) ? asrPreviewUrl : null,
         created_at: new Date().toISOString(),
       };
 
@@ -404,6 +514,7 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
       toast.success('Event created successfully');
       resetEventForm();
       handleRemoveFlyer();
+    handleRemoveAsr();
       setIsEventDialogOpen(false);
       onReload();
     } catch (error: any) {
@@ -437,6 +548,11 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
         updateData.flyer_url = flyerPreviewUrl || null;
       }
 
+      if (pendingAsrKey !== null) {
+        updateData.asr_key = pendingAsrKey;
+        updateData.asr_url = asrPreviewUrl || null;
+      }
+
       console.log('[Admin] Updating event', editingEvent.id, 'with payload:', JSON.stringify(updateData));
 
       await client.apiCall.invoke({
@@ -450,6 +566,7 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
       setEditingEvent(null);
       resetEventForm();
       handleRemoveFlyer();
+    handleRemoveAsr();
       onReload();
     } catch (error: any) {
       console.error('[Admin] Update event error:', error);
@@ -482,6 +599,18 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
     } else {
       setFlyerPreviewUrl(null);
       setPendingFlyerKey(null);
+    }
+
+    // Load existing ASR
+    if (asrUrls[evt.id]) {
+      setAsrPreviewUrl(asrUrls[evt.id]);
+      setPendingAsrKey(null);
+    } else if (evt.asr_url) {
+      setAsrPreviewUrl(evt.asr_url);
+      setPendingAsrKey(null);
+    } else {
+      setAsrPreviewUrl(null);
+      setPendingAsrKey(null);
     }
 
     setIsEditDialogOpen(true);
@@ -667,6 +796,7 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
                   <form onSubmit={handleCreateEvent} className="space-y-4">
                     <EventFormFields />
                     <FlyerUploadSection inputRef={flyerInputRef} isEdit={false} />
+                    <AsrUploadSection inputRef={asrInputRef} isEdit={false} />
                     <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 font-semibold" disabled={flyerUploading}>
                       Create Event
                     </Button>
@@ -688,6 +818,12 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
                         <Badge variant="outline" className="text-green-400 border-green-400/50">
                           <Image className="w-3 h-3 mr-1" />
                           Flyer
+                        </Badge>
+                      )}
+                      {evt.asr_key && (
+                        <Badge variant="outline" className="text-blue-400 border-blue-400/50">
+                          <FileUp className="w-3 h-3 mr-1" />
+                          ASR
                         </Badge>
                       )}
                     </div>
@@ -713,6 +849,19 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
                             alt={`${evt.title} flyer`}
                             className="max-h-32 rounded border border-gray-600 object-contain hover:opacity-80 transition-opacity cursor-pointer"
                           />
+                        </a>
+                      </div>
+                    )}
+                    {asrUrls[evt.id] && (
+                      <div className="mt-3">
+                        <a
+                          href={asrUrls[evt.id]}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-400/30 rounded-lg transition-colors text-sm font-semibold"
+                        >
+                          <FileUp className="w-4 h-4" />
+                          View Event ASRs (PDF)
                         </a>
                       </div>
                     )}
@@ -767,6 +916,7 @@ export default function EventsTab({ events, onReload }: EventsTabProps) {
           <form onSubmit={handleEditEvent} className="space-y-4">
             <EventFormFields />
             <FlyerUploadSection inputRef={editFlyerInputRef} isEdit={true} />
+            <AsrUploadSection inputRef={editAsrInputRef} isEdit={true} />
             <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 font-semibold" disabled={flyerUploading}>
               Update Event
             </Button>

@@ -34,6 +34,8 @@ class EventsData(BaseModel):
     notes: str = None
     flyer_key: str = None
     flyer_url: str = None
+    asr_key: str = None
+    asr_url: str = None
     created_at: Optional[datetime] = None
 
 
@@ -53,6 +55,8 @@ class EventsUpdateData(BaseModel):
     notes: Optional[str] = None
     flyer_key: Optional[str] = None
     flyer_url: Optional[str] = None
+    asr_key: Optional[str] = None
+    asr_url: Optional[str] = None
     created_at: Optional[datetime] = None
 
 
@@ -73,6 +77,8 @@ class EventsResponse(BaseModel):
     notes: Optional[str] = None
     flyer_key: Optional[str] = None
     flyer_url: Optional[str] = None
+    asr_key: Optional[str] = None
+    asr_url: Optional[str] = None
     created_at: Optional[datetime] = None
 
     class Config:

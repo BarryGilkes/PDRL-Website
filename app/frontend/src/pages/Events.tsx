@@ -6,7 +6,7 @@ import ImageLightbox from '@/components/ImageLightbox';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, Clock, Zap, Trophy, ChevronRight } from 'lucide-react';
+import { Calendar, MapPin, Clock, Zap, Trophy, ChevronRight, FileUp } from 'lucide-react';
 import { fetchPublicEvents } from '@/lib/publicApi';
 import { motion } from 'framer-motion';
 
@@ -154,6 +154,17 @@ export default function Events() {
                                       Registration Opens Soon
                                     </Button>
                                   )}
+                                  {evt.asr_url && (
+                                    <a
+                                      href={evt.asr_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/30 hover:border-orange-500/50 font-semibold rounded-lg transition-all duration-300 text-sm"
+                                    >
+                                      <FileUp size={14} />
+                                      View Event ASRs
+                                    </a>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -207,11 +218,24 @@ export default function Events() {
                               <span className="flex items-center gap-1.5"><Calendar size={13} className="text-gray-500" />{evt.date}</span>
                               <span className="flex items-center gap-1.5"><MapPin size={13} className="text-gray-500" />{evt.location}</span>
                             </div>
-                            <Link to={`/events/${evt.id}/results`}>
-                              <Button variant="outline" size="sm" className="border-neon-cyan/20 text-neon-cyan hover:bg-neon-cyan/10 hover:border-neon-cyan/40 font-semibold transition-all duration-300">
-                                View Results <ChevronRight size={14} className="ml-1" />
-                              </Button>
-                            </Link>
+                            <div className="flex gap-2">
+                              <Link to={`/events/${evt.id}/results`}>
+                                <Button variant="outline" size="sm" className="border-neon-cyan/20 text-neon-cyan hover:bg-neon-cyan/10 hover:border-neon-cyan/40 font-semibold transition-all duration-300">
+                                  View Results <ChevronRight size={14} className="ml-1" />
+                                </Button>
+                              </Link>
+                              {evt.asr_url && (
+                                <a
+                                  href={evt.asr_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 px-3 py-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/30 hover:border-orange-500/50 font-semibold rounded-lg transition-all duration-300 text-sm"
+                                >
+                                  <FileUp size={14} />
+                                  ASR
+                                </a>
+                              )}
+                            </div>
                           </CardContent>
                         </Card>
                       </motion.div>

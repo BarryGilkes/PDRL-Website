@@ -31,6 +31,8 @@ class PublicEventResponse(BaseModel):
     notes: Optional[str] = None
     flyer_key: Optional[str] = None
     flyer_url: Optional[str] = None
+    asr_key: Optional[str] = None
+    asr_url: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -58,6 +60,25 @@ def resolve_flyer_url(flyer_key: Optional[str], flyer_url: Optional[str]) -> Opt
         return f"/api/v1/flyers/file/{filename}"
     if flyer_url:
         return flyer_url
+    return None
+
+
+def resolve_asr_url(asr_key: Optional[str], asr_url: Optional[str]) -> Optional[str]:
+    """Resolve the ASR URL for an event.
+    
+    Priority:
+    1. If asr_url is already a local path (starts with /api/v1/asrs/), use it
+    2. If asr_key looks like a local key (asrs/...), derive the URL
+    3. If asr_url is any other URL, use it as-is
+    4. Otherwise return None
+    """
+    if asr_url and asr_url.startswith("/api/v1/asrs/"):
+        return asr_url
+    if asr_key:
+        filename = asr_key.replace("asrs/", "", 1) if asr_key.startswith("asrs/") else asr_key
+        return f"/api/v1/asrs/file/{filename}"
+    if asr_url:
+        return asr_url
     return None
 
 
@@ -102,6 +123,8 @@ async def get_public_events(
                     "notes": getattr(event, 'notes', None),
                     "flyer_key": getattr(event, 'flyer_key', None),
                     "flyer_url": getattr(event, 'flyer_url', None),
+                    "asr_key": getattr(event, 'asr_key', None),
+                    "asr_url": getattr(event, 'asr_url', None),
                 }
             else:
                 event_dict = dict(event)
@@ -110,6 +133,12 @@ async def get_public_events(
             event_dict["flyer_url"] = resolve_flyer_url(
                 event_dict.get("flyer_key"),
                 event_dict.get("flyer_url"),
+            )
+            
+            # Resolve ASR URL using local storage
+            event_dict["asr_url"] = resolve_asr_url(
+                event_dict.get("asr_key"),
+                event_dict.get("asr_url"),
             )
 
             items.append(PublicEventResponse(**event_dict))

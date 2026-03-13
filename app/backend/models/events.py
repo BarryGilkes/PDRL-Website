@@ -21,4 +21,6 @@ class Events(Base):
     notes = Column(String, nullable=True)
     flyer_key = Column(String, nullable=True)
     flyer_url = Column(String, nullable=True)
+    asr_key = Column(String, nullable=True)
+    asr_url = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), nullable=True)
